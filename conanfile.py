@@ -59,16 +59,14 @@ class TracyConan(ConanFile):
             self.options.rm_safe("fPIC")
 
     def layout(self):
-        cmake_layout(self, src_folder="src")
+        cmake_layout(self)
 
     def validate(self):
         if self.info.settings.compiler.get_safe("cppstd"):
             check_min_cppstd(self, 11)
 
     def source(self):
-        self.run(
-            "git clone -b conanrecipe https://github.com/JesusKrists/tracy.git src"
-        )
+        self.run("git clone -b conanrecipe https://github.com/JesusKrists/tracy.git .")
 
     def generate(self):
         tc = CMakeToolchain(self)
