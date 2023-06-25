@@ -10,6 +10,7 @@
 #include "tracy_concurrentqueue.h"
 #include "tracy_SPSCQueue.h"
 #include "TracyCallstack.hpp"
+#include "TracySysPower.hpp"
 #include "TracySysTime.hpp"
 #include "TracyFastVector.hpp"
 #include "../common/TracyQueue.hpp"
@@ -676,6 +677,13 @@ public:
         return m_isConnected.load( std::memory_order_acquire );
     }
 
+    tracy_force_inline void SetProgramName( const char* name )
+    {
+        m_programNameLock.lock();
+        m_programName = name;
+        m_programNameLock.unlock();
+    }
+
 #ifdef TRACY_ON_DEMAND
     tracy_force_inline uint64_t ConnectionId() const
     {
@@ -941,6 +949,10 @@ private:
     void ProcessSysTime() {}
 #endif
 
+#ifdef TRACY_HAS_SYSPOWER
+    SysPower m_sysPower;
+#endif
+
     ParameterCallback m_paramCallback;
     void* m_paramCallbackData;
     SourceContentsCallback m_sourceCallback;
@@ -959,6 +971,9 @@ private:
     } m_prevSignal;
 #endif
     bool m_crashHandlerInstalled;
+
+    const char* m_programName;
+    TracyMutex m_programNameLock;
 };
 
 }
